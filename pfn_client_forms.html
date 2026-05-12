@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palette Fuel Nutrition — Client Forms</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap');
+
+  :root {
+    --green: #5a9e2f;
+    --green-dark: #3d6e1f;
+    --green-light: #e8f5dc;
+    --charcoal: #2b2b2b;
+    --mid: #555;
+    --light: #f7faf3;
+    --border: #d4e8be;
+    --white: #ffffff;
+    --accent: #78c140;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--light);
+    color: var(--charcoal);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--white);
+    border-bottom: 2px solid var(--border);
+    padding: 16px 40px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(90,158,47,0.08);
+  }
+
+  header img {
+    height: 52px;
+    width: auto;
+  }
+
+  .brand-text h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    color: var(--green-dark);
+    line-height: 1.1;
+  }
+
+  .brand-text p {
+    font-size: 0.75rem;
+    color: var(--mid);
+    font-weight: 300;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* NAV TABS */
+  .tabs {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    display: flex;
+    gap: 4px;
+  }
+
+  .tab {
+    padding: 12px 20px;
+    border: none;
+    background: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--mid);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .tab:hover { color: var(--green); }
+
+  .tab.active {
+    color: var(--green-dark);
+    border-bottom-color: var(--accent);
+    background: var(--green-light);
+  }
+
+  /* MAIN */
+  main {
+    max-width: 860px;
+    margin: 32px auto;
+    padding: 0 24px 60px;
+  }
+
+  .form-section { display: none; }
+  .form-section.active { display: block; }
+
+  /* FORM CARD */
+  .form-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px 36px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+
+  .form-card h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    color: var(--green-dark);
+    margin-bottom: 6px;
+  }
+
+  .form-card .subtitle {
+    font-size: 0.85rem;
+    color: var(--mid);
+    margin-bottom: 24px;
+    line-height: 1.5;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-head {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin: 24px 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--green-light);
+  }
+
+  .field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .field-grid.single { grid-template-columns: 1fr; }
+  .field-grid.triple { grid-template-columns: 1fr 1fr 1fr; }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .field.span2 { grid-column: span 2; }
+
+  label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--mid);
+    letter-spacing: 0.02em;
+  }
+
+  input[type="text"],
+  input[type="date"],
+  input[type="email"],
+  input[type="tel"],
+  select,
+  textarea {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 7px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    color: var(--charcoal);
+    background: #fff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(120,193,64,0.15);
+  }
+
+  textarea { min-height: 72px; resize: vertical; }
+
+  .rating-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .rating-row label { font-size: 0.75rem; }
+
+  .rating-box {
+    display: flex;
+    gap: 4px;
+  }
+
+  .rating-box input[type="radio"] { display: none; }
+
+  .rating-box label {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--mid);
+    transition: all 0.15s;
+  }
+
+  .rating-box input[type="radio"]:checked + label {
+    background: var(--green);
+    border-color: var(--green);
+    color: white;
+  }
+
+  .rating-box label:hover {
+    background: var(--green-light);
+    border-color: var(--accent);
+  }
+
+  /* CONSENT CHECKBOXES */
+  .consent-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--green-light);
+    border-radius: 8px;
+    margin-bottom: 8px;
+  }
+
+  .consent-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    accent-color: var(--green);
+    flex-shrink: 0;
+  }
+
+  .consent-item span {
+    font-size: 0.83rem;
+    color: var(--charcoal);
+    line-height: 1.5;
+  }
+
+  /* FOOD DIARY */
+  .meal-block {
+    margin-bottom: 16px;
+  }
+
+  .meal-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--green-dark);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .time-input {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .time-input input {
+    width: 70px;
+  }
+
+  .food-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .food-table th {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--mid);
+    padding: 6px 8px;
+    text-align: left;
+    background: var(--green-light);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .food-table td {
+    padding: 4px 4px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .food-table input {
+    border: none;
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+    padding: 6px 8px;
+  }
+
+  .food-table input:focus {
+    border-bottom-color: var(--accent);
+    box-shadow: none;
+  }
+
+  .day-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .day-tab {
+    padding: 8px 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    background: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--mid);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .day-tab.active {
+    background: var(--green);
+    border-color: var(--green);
+    color: white;
+  }
+
+  .day-content { display: none; }
+  .day-content.active { display: block; }
+
+  /* BUTTONS */
+  .actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .btn {
+    padding: 11px 24px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-primary {
+    background: var(--green);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: var(--green-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(90,158,47,0.3);
+  }
+
+  .btn-secondary {
+    background: var(--green-light);
+    color: var(--green-dark);
+    border: 1.5px solid var(--border);
+  }
+
+  .btn-secondary:hover {
+    background: var(--border);
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--green-dark);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s;
+    z-index: 999;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .info-box {
+    background: #f0f7e8;
+    border: 1px solid var(--green-light);
+    border-left: 4px solid var(--accent);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 0.82rem;
+    color: var(--mid);
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+
+  .tip-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .tip-item {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 0.8rem;
+    color: var(--mid);
+    background: var(--green-light);
+    padding: 8px 10px;
+    border-radius: 8px;
+  }
+
+  .tip-icon { font-size: 1rem; flex-shrink: 0; }
+
+  .yesno { display: flex; gap: 12px; align-items: center; }
+  .yesno label {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 0.82rem; font-weight: 500; cursor: pointer;
+  }
+  .yesno input[type="radio"] { accent-color: var(--green); }
+
+  .scope-list { list-style: none; }
+  .scope-list li {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 7px 12px;
+    border-radius: 6px;
+    font-size: 0.83rem;
+    margin-bottom: 4px;
+  }
+
+  .scope-list.yes li { background: #f0f7e8; }
+  .scope-list.no li { background: #fff1f1; }
+
+  .tick { color: var(--green); font-weight: 700; flex-shrink: 0; }
+  .cross { color: #e05050; font-weight: 700; flex-shrink: 0; }
+
+  .sig-line {
+    border-bottom: 1.5px solid var(--charcoal);
+    min-height: 48px;
+    display: flex;
+    align-items: flex-end;
+    font-size: 0.75rem;
+    color: #aaa;
+    padding-bottom: 4px;
+  }
+
+
+  .btn-submit {
+    background: var(--charcoal);
+    color: white;
+    font-size: 0.95rem;
+    padding: 13px 30px;
+    letter-spacing: 0.02em;
+  }
+  .btn-submit:hover {
+    background: #111;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+  }
+  #success-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+  .success-box {
+    background: white;
+    border-radius: 16px;
+    padding: 40px 40px 32px;
+    width: 400px;
+    max-width: 92vw;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+    text-align: center;
+  }
+  .success-box .tick-circle {
+    width: 64px;
+    height: 64px;
+    background: var(--green-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin: 0 auto 16px;
+  }
+  .success-box h3 {
+    font-family: 'Playfair Display', serif;
+    color: var(--green-dark);
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+  }
+  .success-box p {
+    font-size: 0.85rem;
+    color: var(--mid);
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  @media (max-width: 600px) {
+    header { padding: 12px 16px; }
+    .tabs { padding: 0 12px; overflow-x: auto; }
+    main { padding: 0 12px 60px; }
+    .form-card { padding: 20px 16px; }
+    .field-grid { grid-template-columns: 1fr; }
+    .field-grid.triple { grid-template-columns: 1fr 1fr; }
+    .field.span2 { grid-column: span 1; }
+    .tip-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <img id="logo" src="" alt="Palette Fuel Nutrition logo">
+  <div class="brand-text">
+    <h1>Palette Fuel Nutrition</h1>
+    <p>Sport &amp; Exercise Nutrition</p>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="showForm('consent')">📋 Informed Consent</button>
+  <button class="tab" onclick="showForm('assessment')">🏃 Initial Assessment</button>
+  <button class="tab" onclick="showForm('diary')">🍽️ 3-Day Food Diary</button>
+</div>
+
+<main>
+
+<!-- ============ INFORMED CONSENT ============ -->
+<div id="consent" class="form-section active">
+  <div class="form-card">
+    <h2>Informed Consent Form</h2>
+    <p class="subtitle">Please read this document carefully before signing. If you have any questions, please ask before providing your signature.</p>
+
+    <p class="section-head">1 | About Palette Fuel Nutrition</p>
+    <div class="info-box">
+      Palette Fuel Nutrition provides applied sport and exercise nutrition support to athletes and physically active individuals.<br>
+      Palette Fuel Nutrition is <strong>not</strong> a medical, dietetic, or clinical practice. Advice provided is within the scope of sport and exercise nutrition as defined by SENR and established evidence-based guidelines.
+    </div>
+
+    <p class="section-head">2 | Scope of Practice — Services Provided</p>
+    <ul class="scope-list yes">
+      <li><span class="tick">✓</span> Nutritional assessment and dietary analysis</li>
+      <li><span class="tick">✓</span> Personalised sport and exercise nutrition plans and recommendations</li>
+      <li><span class="tick">✓</span> Education on fuelling, hydration, recovery, and body composition for sport performance</li>
+      <li><span class="tick">✓</span> Meal planning support and practical nutrition strategies</li>
+      <li><span class="tick">✓</span> Monitoring and evaluation of nutrition habits and performance outcomes</li>
+      <li><span class="tick">✓</span> Behaviour change support to improve nutrition practices</li>
+    </ul>
+
+    <p class="section-head" style="margin-top:16px">Services NOT Provided</p>
+    <ul class="scope-list no">
+      <li><span class="cross">✗</span> Diagnosis, treatment or management of medical conditions</li>
+      <li><span class="cross">✗</span> Clinical dietetic practice (requires HCPC registration)</li>
+      <li><span class="cross">✗</span> Prescribing or recommending medication</li>
+      <li><span class="cross">✗</span> Management of eating disorders or disordered eating (referral will be made)</li>
+      <li><span class="cross">✗</span> Advice outside of the practitioner's current competency level</li>
+    </ul>
+
+    <p class="section-head">5 | Your Consent</p>
+    <div id="consent-checks">
+      <div class="consent-item"><input type="checkbox" id="c1"><span>I have read and understood the information about the service and scope of practice</span></div>
+      <div class="consent-item"><input type="checkbox" id="c2"><span>I understand that advice given is for sport and exercise nutrition purposes and does not replace medical advice</span></div>
+      <div class="consent-item"><input type="checkbox" id="c3"><span>I consent to completing nutritional assessments, food diaries, and check-in questionnaires</span></div>
+      <div class="consent-item"><input type="checkbox" id="c4"><span>I consent to my information being stored securely in line with UK GDPR</span></div>
+      <div class="consent-item"><input type="checkbox" id="c5"><span>I understand my right to withdraw from the programme at any time without penalty</span></div>
+      <div class="consent-item"><input type="checkbox" id="c6"><span>I agree to inform the practitioner of any changes to my health, medication, or medical status during the programme</span></div>
+    </div>
+
+    <p class="section-head">6 | Under 18 — Additional Consent</p>
+    <div id="u18-checks">
+      <div class="consent-item"><input type="checkbox" id="u1"><span>I give consent for my child/young person to participate in sport and exercise nutrition support with Palette Fuel Nutrition</span></div>
+      <div class="consent-item"><input type="checkbox" id="u2"><span>I understand and agree to the scope of practice and data protection statements above</span></div>
+      <div class="consent-item"><input type="checkbox" id="u3"><span>I consent to being contacted by the practitioner regarding my child's nutrition programme</span></div>
+    </div>
+
+    <p class="section-head">7 | Signatures</p>
+    <p style="font-size:0.8rem;font-weight:600;color:var(--mid);margin-bottom:12px">Athlete / Participant</p>
+    <div class="field-grid">
+      <div class="field"><label>Full Name</label><input type="text" id="con-name" placeholder="Full name"></div>
+      <div class="field"><label>Date of Birth</label><input type="date" id="con-dob"></div>
+      <div class="field"><label>Signature (Type Name)</label><input type="text" id="con-sig" placeholder="Type your full name as signature"></div>
+      <div class="field"><label>Date</label><input type="date" id="con-date"></div>
+    </div>
+
+    <p style="font-size:0.8rem;font-weight:600;color:var(--mid);margin:20px 0 12px">Parent / Guardian (if athlete is under 18)</p>
+    <div class="field-grid">
+      <div class="field"><label>Full Name</label><input type="text" id="pg-name" placeholder="Parent/Guardian full name"></div>
+      <div class="field"><label>Relationship to Athlete</label><input type="text" id="pg-rel" placeholder="e.g. Parent / Guardian"></div>
+      <div class="field"><label>Signature (Type Name)</label><input type="text" id="pg-sig" placeholder="Type full name as signature"></div>
+      <div class="field"><label>Date</label><input type="date" id="pg-date"></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-submit" onclick="submitForm('consent')">✅ Submit Form</button>
+      <button class="btn btn-primary" onclick="authDownload('consent')">🔒 Admin Access Only</button>
+      <button class="btn btn-secondary" onclick="clearForm('consent')">🗑 Clear Form</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ INITIAL ASSESSMENT ============ -->
+<div id="assessment" class="form-section">
+  <div class="form-card">
+    <h2>Initial Assessment Form</h2>
+    <p class="subtitle">This form is used to gather baseline information to support an individualised sport and exercise nutrition plan. All information is confidential and stored securely in line with GDPR.</p>
+
+    <p class="section-head">A | Personal Details</p>
+    <div class="field-grid">
+      <div class="field span2"><label>Full Name</label><input type="text" id="ia-name" placeholder="Full name"></div>
+      <div class="field"><label>Date of Birth</label><input type="date" id="ia-dob"></div>
+      <div class="field"><label>Age</label><input type="text" id="ia-age" placeholder="Age"></div>
+      <div class="field"><label>Gender</label>
+        <select id="ia-gender"><option value="">Select…</option><option>Male</option><option>Female</option><option>Non-binary</option><option>Prefer not to say</option><option>Other</option></select>
+      </div>
+      <div class="field"><label>Date of Assessment</label><input type="date" id="ia-assess-date"></div>
+      <div class="field"><label>Contact Email</label><input type="email" id="ia-email" placeholder="email@example.com"></div>
+      <div class="field"><label>Contact Phone</label><input type="tel" id="ia-phone" placeholder="+44 7700 000000"></div>
+      <div class="field"><label>Parent/Guardian Name (if under 18)</label><input type="text" id="ia-pg-name"></div>
+      <div class="field"><label>Parent/Guardian Contact (if under 18)</label><input type="text" id="ia-pg-contact"></div>
+    </div>
+
+    <p class="section-head">B | Sport &amp; Training Profile</p>
+    <div class="field-grid">
+      <div class="field"><label>Sport</label><input type="text" id="ia-sport" placeholder="e.g. Basketball"></div>
+      <div class="field"><label>Team / Club</label><input type="text" id="ia-club"></div>
+      <div class="field"><label>Playing Level</label><input type="text" id="ia-level" placeholder="e.g. Academy / Regional / National"></div>
+      <div class="field"><label>Position</label><input type="text" id="ia-position"></div>
+      <div class="field"><label>Years Playing</label><input type="text" id="ia-years"></div>
+      <div class="field"><label>Training Days/Week</label><input type="text" id="ia-train-days" placeholder="e.g. 4"></div>
+      <div class="field"><label>Typical Session Length</label><input type="text" id="ia-sess-len" placeholder="e.g. 90 mins"></div>
+      <div class="field"><label>Match Day(s)</label><input type="text" id="ia-match-days" placeholder="e.g. Saturday"></div>
+      <div class="field"><label>Season Phase</label>
+        <select id="ia-season"><option value="">Select…</option><option>Pre-season</option><option>In-season</option><option>Off-season</option></select>
+      </div>
+    </div>
+
+    <p class="section-head">C | Nutrition Goals</p>
+    <div class="field-grid">
+      <div class="field span2"><label>Main Nutrition Goal</label><input type="text" id="ia-goal" placeholder="e.g. Better energy, recovery, body composition"></div>
+      <div class="field span2"><label>Describe your goal in your own words</label><textarea id="ia-goal-desc" placeholder="Tell us more…"></textarea></div>
+      <div class="field"><label>Goal Timeframe</label><input type="text" id="ia-goal-time" placeholder="e.g. 8 weeks / end of season"></div>
+    </div>
+
+    <p class="section-head">D | Current Eating Habits</p>
+    <div class="field-grid">
+      <div class="field"><label>Typical Wake Time</label><input type="text" id="ia-wake" placeholder="e.g. 7:00am"></div>
+      <div class="field"><label>Breakfast — Do you eat it?</label>
+        <div class="yesno">
+          <label><input type="radio" name="ia-breakfast" value="Yes"> Yes</label>
+          <label><input type="radio" name="ia-breakfast" value="No"> No</label>
+          <label><input type="radio" name="ia-breakfast" value="Sometimes"> Sometimes</label>
+        </div>
+      </div>
+      <div class="field span2"><label>Describe a typical day of eating (meals + snacks + drinks)</label><textarea id="ia-typical-day" placeholder="Describe meals, snacks, and drinks throughout a typical day…"></textarea></div>
+      <div class="field"><label>Do you eat before training?</label>
+        <div class="yesno">
+          <label><input type="radio" name="ia-pre-train" value="Yes"> Yes</label>
+          <label><input type="radio" name="ia-pre-train" value="No"> No</label>
+          <label><input type="radio" name="ia-pre-train" value="Sometimes"> Sometimes</label>
+        </div>
+      </div>
+      <div class="field span2"><label>If yes — what do you typically eat/drink pre-training?</label><textarea id="ia-pre-train-food"></textarea></div>
+      <div class="field"><label>Do you eat after training?</label>
+        <div class="yesno">
+          <label><input type="radio" name="ia-post-train" value="Yes"> Yes</label>
+          <label><input type="radio" name="ia-post-train" value="No"> No</label>
+          <label><input type="radio" name="ia-post-train" value="Sometimes"> Sometimes</label>
+        </div>
+      </div>
+      <div class="field span2"><label>If yes — what do you typically eat/drink post-training?</label><textarea id="ia-post-train-food"></textarea></div>
+      <div class="field"><label>Do you eat on match days?</label>
+        <div class="yesno">
+          <label><input type="radio" name="ia-match-eat" value="Yes"> Yes</label>
+          <label><input type="radio" name="ia-match-eat" value="No"> No</label>
+          <label><input type="radio" name="ia-match-eat" value="Sometimes"> Sometimes</label>
+        </div>
+      </div>
+      <div class="field span2"><label>Describe your match day nutrition</label><textarea id="ia-match-nutrition"></textarea></div>
+    </div>
+
+    <p class="section-head">E | Hydration</p>
+    <div class="field-grid">
+      <div class="field"><label>Approx. Daily Water Intake</label><input type="text" id="ia-water" placeholder="e.g. 2L"></div>
+      <div class="field"><label>Main Drinks Consumed</label><input type="text" id="ia-drinks" placeholder="e.g. water, juice, energy drinks"></div>
+      <div class="field"><label>Do you drink during training?</label>
+        <div class="yesno">
+          <label><input type="radio" name="ia-drink-train" value="Yes"> Yes</label>
+          <label><input type="radio" name="ia-drink-train" value="No"> No</label>
+          <label><input type="radio" name="ia-drink-train" value="Sometimes"> Sometimes</label>
+        </div>
+      </div>
+      <div class="field">
+        <label>Rate your current hydration habits (1–10)</label>
+        <div class="rating-box" id="hydration-rating">
+          <input type="radio" name="hydration" id="h1" value="1"><label for="h1">1</label>
+          <input type="radio" name="hydration" id="h2" value="2"><label for="h2">2</label>
+          <input type="radio" name="hydration" id="h3" value="3"><label for="h3">3</label>
+          <input type="radio" name="hydration" id="h4" value="4"><label for="h4">4</label>
+          <input type="radio" name="hydration" id="h5" value="5"><label for="h5">5</label>
+          <input type="radio" name="hydration" id="h6" value="6"><label for="h6">6</label>
+          <input type="radio" name="hydration" id="h7" value="7"><label for="h7">7</label>
+          <input type="radio" name="hydration" id="h8" value="8"><label for="h8">8</label>
+          <input type="radio" name="hydration" id="h9" value="9"><label for="h9">9</label>
+          <input type="radio" name="hydration" id="h10" value="10"><label for="h10">10</label>
+        </div>
+      </div>
+    </div>
+
+    <p class="section-head">F | Supplements &amp; Special Diet</p>
+    <div class="field-grid">
+      <div class="field"><label>Do you take any supplements?</label>
+        <div class="yesno">
+          <label><input type="radio" name="ia-supps" value="Yes"> Yes</label>
+          <label><input type="radio" name="ia-supps" value="No"> No</label>
+        </div>
+      </div>
+      <div class="field span2"><label>If yes — list supplements, dose, and reason</label><textarea id="ia-supp-list"></textarea></div>
+      <div class="field span2"><label>Do you follow any specific diet?</label><input type="text" id="ia-diet" placeholder="e.g. vegetarian, vegan, halal, gluten-free"></div>
+      <div class="field span2"><label>Any known food allergies/intolerances?</label><input type="text" id="ia-allergies"></div>
+      <div class="field span2"><label>Any foods you dislike or avoid?</label><input type="text" id="ia-dislikes"></div>
+    </div>
+
+    <p class="section-head">G | Health &amp; Medical</p>
+    <div class="field-grid">
+      <div class="field"><label>Do you have any current injuries?</label>
+        <div class="yesno">
+          <label><input type="radio" name="ia-injury" value="Yes"> Yes</label>
+          <label><input type="radio" name="ia-injury" value="No"> No</label>
+          <label><input type="radio" name="ia-injury" value="Unsure"> Unsure</label>
+        </div>
+      </div>
+      <div class="field span2"><label>If yes — please describe</label><textarea id="ia-injury-desc"></textarea></div>
+      <div class="field"><label>Any diagnosed medical conditions?</label>
+        <div class="yesno">
+          <label><input type="radio" name="ia-medical" value="Yes"> Yes</label>
+          <label><input type="radio" name="ia-medical" value="No"> No</label>
+          <label><input type="radio" name="ia-medical" value="Unsure"> Unsure</label>
+        </div>
+      </div>
+      <div class="field span2"><label>If yes — please describe</label><textarea id="ia-medical-desc"></textarea></div>
+      <div class="field"><label>Currently taking prescribed medication?</label>
+        <div class="yesno">
+          <label><input type="radio" name="ia-meds" value="Yes"> Yes</label>
+          <label><input type="radio" name="ia-meds" value="No"> No</label>
+          <label><input type="radio" name="ia-meds" value="Unsure"> Unsure</label>
+        </div>
+      </div>
+      <div class="field span2"><label>If yes — please list</label><textarea id="ia-meds-list"></textarea></div>
+      <div class="field"><label>Referred by / under care of any health professional?</label>
+        <div class="yesno">
+          <label><input type="radio" name="ia-referral" value="Yes"> Yes</label>
+          <label><input type="radio" name="ia-referral" value="No"> No</label>
+          <label><input type="radio" name="ia-referral" value="Unsure"> Unsure</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-submit" onclick="submitForm('assessment')">✅ Submit Form</button>
+      <button class="btn btn-primary" onclick="authDownload('assessment')">🔒 Admin Access Only</button>
+      <button class="btn btn-secondary" onclick="clearForm('assessment')">🗑 Clear Form</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 3-DAY FOOD DIARY ============ -->
+<div id="diary" class="form-section">
+  <div class="form-card">
+    <h2>3-Day Food &amp; Fluid Diary</h2>
+    <p class="subtitle">Please record everything you eat and drink over 3 days — ideally 2 weekdays and 1 weekend day, including at least one training day. Complete it on the same day (don't try to remember the next day!)</p>
+
+    <div class="tip-grid">
+      <div class="tip-item"><span class="tip-icon">📝</span>Record meals, snacks, drinks — including water, tea, coffee, juice, sports drinks, alcohol</div>
+      <div class="tip-item"><span class="tip-icon">📏</span>Be as specific as possible about portions — e.g. "1 medium banana", "200ml semi-skimmed milk"</div>
+      <div class="tip-item"><span class="tip-icon">🏷️</span>Include brand names where possible — e.g. "Kellogg's Special K", "Alpro oat milk"</div>
+      <div class="tip-item"><span class="tip-icon">🍳</span>Note cooking method — e.g. grilled, fried, boiled, raw</div>
+      <div class="tip-item"><span class="tip-icon">⏰</span>Record the time you ate each meal or snack</div>
+      <div class="tip-item"><span class="tip-icon">❌</span>Don't change your normal eating — eat as you usually would</div>
+    </div>
+
+    <div class="field-grid">
+      <div class="field"><label>Athlete Name</label><input type="text" id="diary-name"></div>
+      <div class="field"><label>Dates Covered</label><div style="display:flex;gap:8px;align-items:center"><input type="date" id="diary-start" style="flex:1"> <span style="color:var(--mid);font-size:0.8rem">to</span> <input type="date" id="diary-end" style="flex:1"></div></div>
+    </div>
+
+    <div class="day-tabs" style="margin-top:20px">
+      <button class="day-tab active" onclick="showDay(1, this)">Day 1</button>
+      <button class="day-tab" onclick="showDay(2, this)">Day 2</button>
+      <button class="day-tab" onclick="showDay(3, this)">Day 3</button>
+    </div>
+
+    <!-- DAYS 1, 2, 3 -->
+    <div id="day-1" class="day-content active"></div>
+    <div id="day-2" class="day-content"></div>
+    <div id="day-3" class="day-content"></div>
+
+    <div class="actions">
+      <button class="btn btn-submit" onclick="submitForm('diary')">✅ Submit Form</button>
+      <button class="btn btn-primary" onclick="authDownload('diary')">🔒 Admin Access Only</button>
+      <button class="btn btn-secondary" onclick="clearForm('diary')">🗑 Clear Form</button>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<div id="toast" class="toast"></div>
+
+<script>
+// ---- LOGO ----
+const LOGO_B64 = '/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAEcAXcDASIAAhEBAxEB/8QAHAABAAICAwEAAAAAAAAAAAAAAAUGBwgCAwQB/8QAQRAAAQMCAgUJBgQDCQEBAAAAAAECAwQFBhEHEiFBURMVMTNSYXGR0QgUIjKBoSNCQ7EWJDVTYnJzgpKiweGyRP/EABsBAQACAwEBAAAAAAAAAAAAAAABAgMEBQYH/8QANhEBAAIBAgQDBQcDBAMAAAAAAAECAwQRBRIhMQYTQSIyYXGBFDNRkbHR4SShwSNCQ/BEYnL/2gAMAwEAAhEDEQA/ANZQAYmUAAAABAAAAB6KOknq5UjgjVy8dyA3ecE6mGqvUz5WPW4HgrLVW0uayQqreLdqE7Sjd4QfT4QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACdkbgABuAAkAAAAAHCfqlAn6pQBzABVcAAQAAAD6iKq5IWSwWTY2prG97GepMRuiZeOzWSWrylnzjh+6lqpaeGliSOBiMan3O1NiZJsRAXiNlZncC7UyXanBQCUIy5WWkq2q5jeSl3KnQpVLhQ1FFLqTMVE3O3KX46aymhq4Vimajmr0dxWY3TEseg9l2oZKCqWJ21q7WrxQ8ZRYAAAAAAAAAAAAAAAAAAAAAAASgABIAAAAAAAAAAAAAOE/VKBP1SgDmACqQAAAD1WuldWVscLU2Ku3wAl8L2tJFStnb8KL8DV3rxLOcYo2RRtjYiI1qZIiHIyRGykgAJAAAAD49zWMV7lya1M1UCBxnqe7w5/Pns8CrHvvlctdWuenVt2MTuPAY57rwAAgAAAAAAAAAAAALFgHC9Ziq/RUNO1UhRdaeTLYxu8plyVxUm952iEWtFY3lyw9g+53jD9xvULFbTUTNZVVPn4ohXDcS2WW326xNstLC1tIkaxq3L5s02qpqvjyxy4exRWW6Rqo1siujVd7V2opx+F8V+25b1np+Hya2DUeZaYQQAO5s2dwAEgAAAAAAAAAAAAAAADhP1SgT9UoA5gAqkAAAtWD6TUgfVuTa/Y3wK1SwunqGQtTNXLkX+mibBTxwsTJGJkWrCJdgALqgOE0sULdaWRrE71PG+825i5e8I7wG494It2ILa388i+DTrdiO3p0JKv0I3hOyYIDFlfycaUcTvidtfluTgKrEsSRqlPC5Xr0K7cVqomknmdLK7Wc5c1UiZTEOsAFEgAAAAAAAAAAAH1Nq5Ad9vpKivrYaOljdJNK5GsaibVVTabRthSnwph6OlaiOq5UR9RJltV3DwQqGgnBKWyhTENyhT3udP5drk2xt4+KmVjxXHeJ+dfyMc+zHf4z/Dl6rPzTyx2DFvtA4VW52dl+pI1dU0iZTIibXM4/QykcJ4oqiCSCZqPikarXtXeinF0eptpc1ctfRrY7zS0WhpcfC1aTsMS4XxPPS6q+7SqslO7crV3fQqp9Mw5a5qRkpPSXaraLRvAADKsAAAAAAAAAAAAAAAA4T9UoE/VKCYHMAFEgByY1XvaxqZqq5IBPYPpNed9W9NjNjfEtB5rXSto6GOFE2ombvE9JkiNlZDzXKrbR0qyrteuxjeKnpOmWmZNUsml+JI/kbuReJKFMvPvnvKLWPze5NbVz+XuPASeJ1Vb1Oi7lIwxyuAAgAAAAAAAAAAAAAAAADIuhXBTsRXdLlWsyt1I7Nc02SO3NKng7D9ZiS+wWyjYqq92b3ZbGN3qptZhyz0dhs9PbKGNGRQtyVU/Mu9VOFxviX2bH5VJ9q39oamqzckcsd3vajWtRrWo1rUyRE6EQ+gHhHKAABT9LGE48U4be2Nqe/UyLJA7evFpq9PFJBM+GVqskY5Wuau5UN0TBun3BXu8/8AE1th/CkXKqY1Pld2j0/h/iPl2+z5J6T2+f4N7SZtp5JYcAB7N0QAAAAAAAAAAAAAAAHCfqlAn6pQTA5gAokJnCtH7xXcs5M2RbfqQ6IqrknSpeLDRpR25jVT43/E4tWOqJe8AF1Q+nwAU3FTNS7yO7SZkSWHGkeU8MvFuRXjHPdeAAEAAAAAAAAAAAAAAHKNjpJGsY1XOcuSIm9TiZS0DYOS73Vb5XR50dI78Nqpskf/AOGvqtTTS4Zy39GPJeKV5pZI0NYPTDWH0qqqNEuFY1HSZ9LG7ml7APmuoz31GScl+8uLe83tvIADCqAAAdNdSwV1HNR1UaSQTNVj2qnSincCYmYneBqvpOwhUYTvz4dVXUUyq6nk3KnDxQqRtzjbDdFiixS26qaiPyzhky2sduNV8RWetsV2nttfEscsTlTuVNyoe/4NxONXj5Lz7cd/j8XW0+bzK7T3RwAO02QAAAAAAAAAAAABwn6pQJ+qUEwOYAKJSeHKNau4NVU+CP4nF1IvDNItNbke9Mny/EvhuJQyRHRWQAEoAABBYyZnRwu7LiqFxxY3O0q7g9CnFLd1oAAVSAAAAAAAAAAAACUPfh+2VF5vFNbaViulnejUyTo4qba4Zs9LYbHS2ukaiMhYiOXtO3r5mKfZzw3qsnxJUxptzjp8081MzniPEOt83N5NZ6V/X+HM1eXmtyx6AAPOtMAAAAAAAAKBpkwUzEtnWvo40S5UrVVuXTI3ehfwZ9NqL6fJGSk9YWpeaW3hpZIx0b3Meitc1clRdynEyhp5wg2z3hL1Qx6tHWL8aImxj9/mYvPpWk1NNTijLTtLtY7xesWgABsrgAAAAAAAAAJHCfqlAn6pQBzPVaqdaqviiRNiuzXwPKWbBtNkklW5P7rVKxG6ZWJqI1qNRMkRMkABkUAAAAAEXir+jP8A8aFLLnitUSzuTi9CmFLd1oAAVSAAAAAAAAAAID22O3zXS70tvgarpJ5EYiJ3niMs+znYW1d7qL1OzNlI3VjzTpcvDwNbXamNNgtln0/Vjy35KTZm6wWyCzWaltlO1EjgjRviuW1T3AHzK1ptM2nvLizO/UABVAdNJLyzHu7L1b5HenShF4dk5SmqV4VUieSl4rvWZTt0SYAKIAAAAAEXiyy0+IMP1VrqGIqSsXUVfyu3Kak3ehnttyqKCpYrZYJFY5F7lNyjBHtGYeSmudPf6ePJlSmpNkn5k3+R6Tw7rfLyzgt2t2+bc0eTa3LPqxCAD2zpgAAAAAACQAAHCfqlAn6pQB2NRVVETpUvtpp0pbfDFlkurmviU2zQLUXKGPLNNbNfBC+7E2J0CpL4ACyoAAAAAhcYP1bexnacVEsmNJNsEWfRm4rZjt3WgABCQAAAAAABKAAEj6iZrkhtHodsyWbAtG1zdWap/Gkz6c16Psa24XoXXLENDQo1V5WZrVy4Z7TcCCJsFPFA1MmxMaxPomR5bxNqNqUwx69Wjrb9Iq5gA8c5wAAOMq6sT3cGqv2IfBbteyrJ255HfclqtcqOdeETl+ykDo5fymE6aTtOcv3Uz1j/AEbT8Y/yvHuysQAMCgAAAAAFe0j2dl8wbcKNzUV7Y1kj2bdZNuwsIyRyK1UzRUyUyYsk4rxeveOqazyzvDSyRrmPcxyZOauSocSwaRLbzTjO50WWTWzKrfBdpXz6livGSkXj1jd3KzvG4ADLCwAAAAAAADhP1SgT9UoAsWDYdarllVPkbsLSQeDY8qGWRelz8kJwmOyJ7gAJQAAAAfJHJHE+RehrVVQKfiublbq5ueaRojSIO2qlWapklVc9ZyqfaWnmqZUjhYr3LwMa7pO6npp6hyNhic9e5Cy27DsMaI+rdyj+ynQTcMUcLNWJjWJwRCYqjdVaTDlXJtnc2JOG8koMN0bETlZHyfYmgW5YRujm2S2t/RVfFT46xW136Tk8HEkBtCEHLhqldnycz2fTMjqrDlZHmsLmypuROktoGxux9UUlRTqqTQvblvVNh0F+vDmpa51ciLkxcs03lBKzGyWQ9ANvSsx7DO5usymjc9U+yGyRhL2ZaX+ZutaqfppGnnmZtPAeIMnPrJj8IiHK1dt8gADiNYAAHRcF1bdVKu6B/wD8qVzRO/XwNRL3vT/kpYLxstFZl/YP/ZSr6GX8pgGkXhJIn/JTcpH9Lef/AGj9JZI+7n5rkADTYwAAAAAAAGvXtG0KU+MYaljcmzwNVV4u3mLzNntNwIiWip3u12+RhM+j8GvN9Fjn6fk7GmnfHAADqM4AAAAAAADhP1SgT9UoAvGF2atnjXtKq/ckzwYeTKzwfU95MdlZAASAAAEViiq5C2rG1cnyrl9CV8SnXyofcrqkMKazWrqNIlMPFbaKWuqEijTZ+Z3BC626hgoYeTib8S/M7epxtNDHQUrYmp8a7Xu4qesRGxMgAJQAAAD6dNTVU9M1VnlazLdntA7TqqqmGliWSd6NT7qRrrrNVO5O207nr0co7YiHbS2tOUSeukWom6dvyoRuIq81FdW0j5msWGkauzPYrivF1xP/AEaRE2JmhSiJSz97NMaJhu5S5bVqETP6GVzFvs2Kn8J12XT7ymfkZSPm3GJ31uT5uPqPvJAAc1hAAB5bx/SKz/If+xTtBLtbAEaZ7W1Uyf8AIuN3/pNZ/kP/AGKLoAk1sGzM7FU/7qdDFG+iyf8A1X/LNX7ufoyIADnsIAAAAAAADD/tNonNdoXekr/2MFGcPackb7rZ4s/i1nqqGDz6HwGP6Gn1/V1tL91AADsNkAAAAAAABwn6pQJ+qUAXrDTtazQ9yqn3JEhcISa9vezPaxxNEx2VkABIAHRVyTNZq08evIvQq9De9QPBiO4e6we7xLnPImWSbkOvDdrWmZ71UJ+K75U7J6aG1RxTLU1T+XqF25r0J4EiRskABKAAAAABwlj5RMuUcz/CeZtsokfrui5R/F65nsAHxrWsbqsajU4ImR9AA8GIm69omThtKMZAuTOUt1QzerFyKAqZKqFZTDPPs0TItiudPntSZrvsZbME+zRWoy9XGicvWQI5qd6KZ2PnXHKcmtv8dp/s5OqjbLIADktcAAHRcm69tq28YH/spjb2dZdew3WH+yq/3zMmVe2jqE4xP/ZTEns7TalVfqTP9bWy8FU6mmjm0Ob4cv6s9I3xW+jL4AOWwAAAAAAAfU6QMB+0rVo/EdDRoufJwI5fqYlLlpluXOOP7g5rtaOF3JsXuQpp9M4Xi8rSY6z+Ds4K8uOIAAb7MAAAAAAAA4T9UoE/VKALDg6dGVckC/qN2eJajH1BOtNVxzIvyrtL/E9ssTZGrm1yZoTCJcgASgAAAAAAAAAAAAAAAAAAByI5qtVM0VMjHtbEsNXLEvS1yoZCKhiym5G48q1PhkTP6kSmEtoguqWnHlvme7Jkj+Sd362xDadek0upZn09THPGuT43I5F70NucG3aO+YYoLlGqLykSI9M+hyJkp43xNp9rUzR8nP1tOsWS4APKtEAAHCdM6eVOMbv2MLaBpOTx7faVVyza9UTwcZsVNZqt4oqGA9G03uWmutpc8uVmljy+uZ2eG159NqK/Df8AJs4Y3pePgz4AoOM1gAAAAAPJe61lts9ZXyKiNghc/bvXI9ZjnT/eUt2DEoWOylrpNXJF2o1Nps6PBOoz1xx6yvjrz2iGvFyqXVlwqKp6qrpZHPXPvU84B9SiIiNodsAASAAAAAAAA4T9UoE/VKAOZYcOXhsLEpapyoz8juBXgQhkeN7JG60bkc3iin0x/S1tTSuzhmc3uz2E7QYk6GVkf+tpbc2WMHTS1VPVM1oJWvThntQ7iUAAAAAAAAAAAAAAAABFYopPeLcsjU+OLb9CVPjmo9qtd0KmSgY4M0ezniRkclRhyqky5T8WnzXfvQxJeaN1FXPiVPhVc2r3HGz189rudPcKZ6tlgej2qncaGv0kavBbFP0+auXH5lZq3KBE4QvlNiLD9LdKdyLyjUSRqflenShLHzS9LY7TW3eHFmJidpAAUQ+s+ZPE10jfzbp5WXozrnL/ALs/U2LTpQ1w0lotv0wpKvw5TxSeeR3uAxzXyU/GstrS9ZmPg2Pd0qfDjFIk0Mczeh7Ucn1ORwWqAAAAABrRpxxC294xkggfrU1EnJM8U6fuZu0oYlhw1hSoqFcnvM7Vip271Vd5qtI980znuVXPe5VXiqqer8NaPe06i3yj/Le0ePrzy4HZDFLNIkcMbpHuXJGtTNVMi6P9FN0vqR1t0V1BQrtTWT43p3IZvw3hHD9ggbHb7fFrom2V7dZyrxzOrruO6fTTyV9q3w7fmz5dVWnSOstdbLo5xddmJJT2qSNnal+H9yx0+hTEsjUWSqo4lXc5V2Gwqqq7z4efyeJNXafZiIas6zJPZr9PoRxFHGrmXChld2WquZB3HRZjGiar1t3LMTfG5F+xs6fUVU3kU8R6yvvbT9ERrMkd2nFws90t7lStt9TBlvfGqIeFUVOlDdCogp6lMqmCKZOEjEUhK/BWFa5yuqbJTOVeymr+x0cXiiv/ACY/ylmrrY9Yakg2YrNEmD6hyq2CeDPdG7oIufQjh1z/AMGvrWpwcqKbtfEejnvvH0ZY1mOWvE/VKCy6TLVZrLfJbZZqiaoZAiNme9U2v35A7WLJGWkXjtLYrbmjeFdABdYAAHZTzywSJJC9zHJvRSfoMSOaiMrI9b+83pK4Aheqe72+fLVnRqrudsPax7H/ACPa7wXMxwdsVRPEv4cr2+Ck7mzIh8KXT324RIicrrpwch7ocTyfq07V/wAKk7myzAhI8S0jvnhkZ9czvZf7avTI5v8ApG6EoCOS+Wxf11/2nxb7bE/Wcv8ApJ3EkCGlxHRN+Rj3/Y8NRiaVc0gga1OLukjc2WdckTNVRE4qeGqu1BTu1XzI53Bu0qNXc62qX8Wd2XBNiHkI3Tst0uJKJqLqRyOU8UuI6mV2rS0yIu7eQ9tlpoqhFqoOVjXp29Bdbe2idC2WkZHq8UTag7itVdHd6+NamoZsY3NM9mwhl2LkpkjxKdia3+6VXLRp+FIufgomBc9BeMEsd75prZMqGsXVRVXYx+5TYrwXNOJpW1ytcjmqqKi5oqGyGhPGSYhsqWytkTnCjbkiqu2Rm5fE8h4h4d/5NI+f7tDV4f8AfDIgAPJtANePaIiWLHzaluxXwsVF8ENhzBPtMwo282ydE6yFyL9FO34fttrYj8Yls6SdsjMeEqpKzC9sqGrnrUzEXxRNpJlN0LViVeju3oq5vi1mO8y5HM1WPy896fhMsOSNrTAADXUD497I43SSORrGIrnKu5EPpizTxjNtrtq4foJU98qE/HVq7WM4fU2dJpb6rNGKnqvjpN7csMZ6XMVSYpxO9sCqtHTKsdO1N/FfqXzQ/oyjiiivuIYNaRyI6np3JsTg53oROgzAjbjP/EN2hVaaJ38uxydY7j4IZ57k2Ih6DivEa6akaPTdIjpM/wCP3befLyR5dBMkRERERETJETcADyzRAAAAAAAACt6SMRxYZwtUVquT3h7VjgbntVy7/oWTYiZqqIidKruNatN2Kef8TvpaaRVoqJVjYiLsV29TqcI0P2vURE+7HWWfT4vMvt6KBcJpKh8s8rldJI7Wcq71VQdc/VKD6PEbOu5gAhIAAAAAAAAAAAAAAAAAAAAAHrt1fUUMmvC/YvS1ehTyAC72q701c1G5pHLvau/wPXX0zKulfBImxybF4KY+a5zXI5qqip0KhOWvEE0OUdUnKx9Ge9Cd0bImtppKWofDKmTmr5nrw3eKyw3iC50Mislidn3OTeik3dYKa8UnLUj2umYmaJvVOBVHtVrla5MlRclQrekWia26xJMbxtLbnBmJKHFFliuNG9NbJEljz2sdvQmjVDR5i2twnemVUDldTPVGzxKuxzfU2hsV2ob3bIrjbpmywyJnsXa1eCnz3i3DLaLJvX3J7fs5OfBOOenZ7jD/ALTFLrWy2VmXyyLHn4pmZgMd+0HS+8YESTLqJ0f/ANGLhF+TWY5+P6q6edskI32ba3lcNV1Eq5uim107kVDKxgX2aq7ksQV9Cq9fCionguZnoyccx+Xrb/Hqtqa7ZJACKxXf7fhuzy3G4So1rU/DZn8UjuCHMpS17RWsbzLBETM7Qj9ImLKTCdikqpXI6rkRW08We1zuPghrvhu33HHONmRzvdJJUScpO9fyt3njxpiWvxRepLhWvXJVyijz2MbuRDM3s8YeShw/LfJ48p6xdWNVToYn/p7CuCOD6K2SfvLdP4+joRX7PjmfWWTLfSQUFBBQ0rEZDAxGMRE3Id4B42ZmZ3lzgA+SvZFGskr2xsb0ucuSIQPoTb0Farsa2aKZaWgWW6VaLlyVK3W297uhBBDie7/HXSx2eld+jF8Uqp3ru+hsfZrxG9/Zj4/t3X5Jjv0TlXX0lM9I5JUWV2xI27XKvgfY3VEy6zmcjHuRfmX0Ou22yjt7f5ePN6/NI9dZ7vFT2GO01j3VZ29HxEyTI+g8t2uFLardNcK2VscELVc5VX7FIibTtHciN1M01Yr/AIdw06kpn5V1aisZku1rd6mtDlVzlcq5qu1VLBj/ABJU4oxHUXGZypFrasLOyxOgrx9H4Tofsenis+9PWf8AvwdfBi8um3q4T9UoE/VKDps7mACAAAAAAAAAAAAAAAAAAAAAAAAAAAHZBNLA9HxPcxyb0U5VVQ6pk5SRE116VTedIAFx0Z43rcJXNM1dLb5Vynhz+6d5TgYs2Gmek48kbxKtqxaNpbj2O7UF7tsdwts7ZoJE3LtavBSG0rUvvmj66wombkjRyfRczXfAeMbnhO5JPSSK+ncuU0Dl+FyepsLbMSWfGWE65bfKiyPpntkgd8zFy4Hh9XwzJw/PXJXrTeOv19XMyYZxWiY7MDaGrjzbpAt71XJJXLD/ALthtIuxVQ06t0r7diCCVNj6eoRfJxtFijGFnw5Y4q+tqGuklha+KFq/FIqobviLTWyZ8dqRvNo2/wC/myaukzaJj1e7FF+t2HLTJcblMjGNT4GZ/E9eCGsWPsXXDFt2dVVTlZAxVSGFF2MT1OvG+K7niu6Oq66RUjRcooUX4WIV86vCeEV0cc9+t5/sz6fTxjjee712ekfX3SmomIqumlaxMu9TcGz0TLda6WghYiNgiazJOKJtU1IwrdXWS/U1zZTNqXwOzZG5dirlkhliC8aWMUNT3OlSgp39EmpqZJ49Jrce0uTUTSOaK1j1mduqmqpN5jrtDMdVU01LGslTURQsTpV70TIq120j4Tt71jSvWsl3Mpm6+alXoNFNdXyJUYqxFU1Un5o43rkv1Lzh/B+HLE1Ob7ZCj0/Ue3Wev1PN2xaLD3vN5+HSPzn9mnNcdfXdXkxLjO/fDh7D6UEC/wD6K5cs04oh6KfA9VcHJNiu+1Vyf/YxrqReGSdJdt2W5NwMU62a9MNYr8u/5z1V8zb3Y2eS1Wu3WqBIbbRw0zETL4G5Kvip6wDUtabTvM7ypM7gB1VlTT0dK+qqpmQwxpm571yRCIiZnaEOcskcMT5pXtZGxFc5zlyRENddM2PP4jrua7bI5LbA7aufWu4+B6dLOkyW9rJZ7I90VuRcpJOh03/hi09nwTg84ds+aPa9I/D+XS02n5fat3AAenbrhP1SgT9UoA5gh+dKjsReS+o50qOxF5L6kCYBD86VHYi8l9RzpUdiLyX1AmAQ/OlR2IvJfUc6VHYi8l9QJgEPzpUdiLyX1HOlR2IvJfUCYBD86VHYi8l9RzpUdiLyX1AmAQ/OlR2IvJfUc6VHYi8l9QJgEPzpUdiLyX1HOlR2IvJfUCYBD86VHYi8l9RzpUdiLyX1AmAQ/OlR2IvJfUc6VHYi8l9QJgEPzpUdiLyX1HOlR2IvJfUCYBD86VHYi8l9RzpUdiLyX1AmAQ/OlR2IvJfUc6VHYi8l9QJgEPzpUdiLyX1HOlR2IvJfUCYPZablXWqrSqoKmSCVN7VyzTgpW+dKjsReS+o50qOxF5L6kTWLRtKJjdOTzSTVD53rnI9yucvep219dWV72vrKiSZzGo1uuueSJuQr3OlR2IvJfUc6VHYi8l9RywdEwCH50qOxF5L6jnSo7EXkvqSJlrla5HNVUVFzRUMiYM0sX6yNZS1ypcKRuzKRfjancpiLnSo7EXkvqOdKjsReS+ph1GlxaivLlrvCt6VvG1obbYd0o4Uu6NY+qWhmd+SfoT6lxpKukq2a9LVQzt4seimjHOlR2IvJfU9dHia8UbkdS1T4lTo1XOT/ALPPZ/DOK3XFeY+fVqX0dZ92W8eS8D4agUGlvHNI1GR3ZXtToR6Kv/ZKR6b8dNbly9E7vdCuf/0cvJ4fz0n3o/v+zBOltHq2syXgcZHMjYr5HtY1qZqrlyyNU6jTdjqSJWJU0cef5mQqip9ys3jH2Kbuv8/cpJk4ayon2Uvg8O5sk+1eIj6/wmuktPeWzmLNJ+GbE18cVR7/AFKJsjhXNM+9TBeOMdXvFU6pVTLFSovwU8a5NTx4mPlutQq5q2LyX1PnOlR2IvJfU9JoeD6fSTzRG9vxluYtPTH19UwCH50qOxF5L6jnSo7EXkvqdVnTAIfnSo7EXkvqOdKjsReS+oErP1SgiZLnO5iorIvJfUEj/9k=';
+document.getElementById('logo').src = 'data:image/png;base64,' + LOGO_B64;
+
+// ---- TABS ----
+function showForm(id) {
+  document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function showDay(n, btn) {
+  document.querySelectorAll('.day-content').forEach(d => d.classList.remove('active'));
+  document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('day-' + n).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ---- BUILD DAY TEMPLATE ----
+const meals = [
+  { id: 'breakfast', label: '🌅 Breakfast', cols: ['Food / Drink', 'Amount / Portion', 'Notes (brand, cooked/raw)'] },
+  { id: 'mid-morning', label: '🍎 Mid-Morning Snack', cols: ['Food / Drink', 'Amount / Portion', 'Notes'] },
+  { id: 'lunch', label: '🥗 Lunch', cols: ['Food / Drink', 'Amount / Portion', 'Notes'] },
+  { id: 'afternoon', label: '⚡ Afternoon Snack / Pre-Training', cols: ['Food / Drink', 'Amount / Portion', 'Notes'] },
+  { id: 'evening-meal', label: '🍽️ Evening Meal', cols: ['Food / Drink', 'Amount / Portion', 'Notes'] },
+  { id: 'evening-snack', label: '🌙 Evening Snack', cols: ['Food / Drink', 'Amount / Portion', 'Notes'] },
+];
+
+function buildDayHTML(day) {
+  let html = `
+    <div class="field-grid triple" style="margin-bottom:16px">
+      <div class="field"><label>Date</label><input type="date" id="d${day}-date"></div>
+      <div class="field"><label>Training Day?</label>
+        <div class="yesno">
+          <label><input type="radio" name="d${day}-train" value="Yes"> Yes</label>
+          <label><input type="radio" name="d${day}-train" value="No"> No</label>
+        </div>
+      </div>
+      <div class="field"><label>Session Time (if yes)</label><input type="text" id="d${day}-session" placeholder="e.g. 18:00"></div>
+      <div class="field"><label>Match Day?</label>
+        <div class="yesno">
+          <label><input type="radio" name="d${day}-match" value="Yes"> Yes</label>
+          <label><input type="radio" name="d${day}-match" value="No"> No</label>
+        </div>
+      </div>
+    </div>`;
+
+  meals.forEach(m => {
+    html += `
+    <div class="meal-block">
+      <div class="meal-title">${m.label} &nbsp; <span style="font-weight:400;color:var(--mid);font-size:0.78rem">Time:</span> <input type="text" id="d${day}-${m.id}-time" placeholder="__:__" style="width:65px;padding:4px 8px;font-size:0.8rem"></div>
+      <table class="food-table">
+        <thead><tr>${m.cols.map(c => `<th>${c}</th>`).join('')}</tr></thead>
+        <tbody>`;
+    for (let r = 1; r <= 4; r++) {
+      html += `<tr>${m.cols.map((c, i) => `<td><input type="text" id="d${day}-${m.id}-r${r}-c${i}" placeholder=""></td>`).join('')}</tr>`;
+    }
+    html += `</tbody></table></div>`;
+  });
+
+  // Fluids
+  html += `
+    <div class="meal-block">
+      <div class="meal-title">💧 Fluids Throughout the Day</div>
+      <table class="food-table">
+        <thead><tr><th>Drink</th><th>Amount (ml/cups)</th><th>Time</th><th>Notes</th></tr></thead>
+        <tbody>`;
+  for (let r = 1; r <= 5; r++) {
+    html += `<tr><td><input type="text" id="d${day}-fluid-r${r}-c0"></td><td><input type="text" id="d${day}-fluid-r${r}-c1"></td><td><input type="text" id="d${day}-fluid-r${r}-c2"></td><td><input type="text" id="d${day}-fluid-r${r}-c3"></td></tr>`;
+  }
+  html += `</tbody></table></div>
+    <div class="field-grid single" style="margin-top:12px">
+      <div class="field"><label>Daily Reflections</label><textarea id="d${day}-reflections" placeholder="How did you feel? Any notes about today's eating or training…"></textarea></div>
+    </div>`;
+
+  return html;
+}
+
+[1, 2, 3].forEach(d => {
+  document.getElementById('day-' + d).innerHTML = buildDayHTML(d);
+});
+
+// ---- UTILS ----
+function v(id) {
+  const el = document.getElementById(id);
+  return el ? el.value || '' : '';
+}
+
+function radio(name) {
+  const el = document.querySelector(`input[name="${name}"]:checked`);
+  return el ? el.value : '';
+}
+
+function checks(ids) {
+  return ids.map(id => {
+    const el = document.getElementById(id);
+    return el && el.checked ? '✓' : '☐';
+  });
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function clearForm(type) {
+  document.querySelectorAll(`#${type} input:not([type="radio"]):not([type="checkbox"]), #${type} select, #${type} textarea`).forEach(el => el.value = '');
+  document.querySelectorAll(`#${type} input[type="radio"], #${type} input[type="checkbox"]`).forEach(el => el.checked = false);
+  toast('Form cleared');
+}
+
+// ---- EXCEL EXPORT ----
+function downloadExcel(type) {
+  const wb = XLSX.utils.book_new();
+
+  if (type === 'consent') {
+    const c = checks(['c1','c2','c3','c4','c5','c6']);
+    const u = checks(['u1','u2','u3']);
+    const data = [
+      ['PALETTE FUEL NUTRITION — INFORMED CONSENT FORM'],[''],
+      ['ATHLETE / PARTICIPANT'],
+      ['Full Name', v('con-name')],
+      ['Date of Birth', v('con-dob')],
+      ['Signature', v('con-sig')],
+      ['Date', v('con-date')],[''],
+      ['CONSENT — ATHLETE'],
+      [c[0], 'Has read and understood the information'],
+      [c[1], 'Understands advice is for sport/exercise nutrition only'],
+      [c[2], 'Consents to completing assessments and food diaries'],
+      [c[3], 'Consents to data being stored in line with UK GDPR'],
+      [c[4], 'Understands right to withdraw at any time'],
+      [c[5], 'Will inform practitioner of changes to health/medication'],[''],
+      ['CONSENT — UNDER 18 (PARENT/GUARDIAN)'],
+      [u[0], 'Consents for child to participate'],
+      [u[1], 'Agrees to scope of practice and data protection'],
+      [u[2], 'Consents to being contacted regarding child\'s programme'],[''],
+      ['PARENT / GUARDIAN'],
+      ['Full Name', v('pg-name')],
+      ['Relationship', v('pg-rel')],
+      ['Signature', v('pg-sig')],
+      ['Date', v('pg-date')],
+    ];
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    ws['!cols'] = [{wch: 8}, {wch: 50}];
+    XLSX.utils.book_append_sheet(wb, ws, 'Consent Form');
+    XLSX.writeFile(wb, 'PFN_Informed_Consent.xlsx');
+
+  } else if (type === 'assessment') {
+    const data = [
+      ['PALETTE FUEL NUTRITION — INITIAL ASSESSMENT FORM'],[''],
+      ['A | PERSONAL DETAILS'],
+      ['Full Name', v('ia-name')],
+      ['Date of Birth', v('ia-dob')],
+      ['Age', v('ia-age')],
+      ['Gender', v('ia-gender')],
+      ['Date of Assessment', v('ia-assess-date')],
+      ['Contact Email', v('ia-email')],
+      ['Contact Phone', v('ia-phone')],
+      ['Parent/Guardian Name', v('ia-pg-name')],
+      ['Parent/Guardian Contact', v('ia-pg-contact')],[''],
+      ['B | SPORT & TRAINING PROFILE'],
+      ['Sport', v('ia-sport')],
+      ['Team / Club', v('ia-club')],
+      ['Playing Level', v('ia-level')],
+      ['Position', v('ia-position')],
+      ['Years Playing', v('ia-years')],
+      ['Training Days/Week', v('ia-train-days')],
+      ['Typical Session Length', v('ia-sess-len')],
+      ['Match Day(s)', v('ia-match-days')],
+      ['Season Phase', v('ia-season')],[''],
+      ['C | NUTRITION GOALS'],
+      ['Main Nutrition Goal', v('ia-goal')],
+      ['Goal Description', v('ia-goal-desc')],
+      ['Goal Timeframe', v('ia-goal-time')],[''],
+      ['D | CURRENT EATING HABITS'],
+      ['Typical Wake Time', v('ia-wake')],
+      ['Eats Breakfast?', radio('ia-breakfast')],
+      ['Typical Day of Eating', v('ia-typical-day')],
+      ['Eats Before Training?', radio('ia-pre-train')],
+      ['Pre-Training Food/Drink', v('ia-pre-train-food')],
+      ['Eats After Training?', radio('ia-post-train')],
+      ['Post-Training Food/Drink', v('ia-post-train-food')],
+      ['Eats on Match Days?', radio('ia-match-eat')],
+      ['Match Day Nutrition', v('ia-match-nutrition')],[''],
+      ['E | HYDRATION'],
+      ['Daily Water Intake', v('ia-water')],
+      ['Main Drinks', v('ia-drinks')],
+      ['Drinks During Training?', radio('ia-drink-train')],
+      ['Hydration Rating (1-10)', radio('hydration')],[''],
+      ['F | SUPPLEMENTS & SPECIAL DIET'],
+      ['Takes Supplements?', radio('ia-supps')],
+      ['Supplements List', v('ia-supp-list')],
+      ['Specific Diet', v('ia-diet')],
+      ['Food Allergies/Intolerances', v('ia-allergies')],
+      ['Foods Disliked/Avoided', v('ia-dislikes')],[''],
+      ['G | HEALTH & MEDICAL'],
+      ['Current Injuries?', radio('ia-injury')],
+      ['Injury Description', v('ia-injury-desc')],
+      ['Diagnosed Medical Conditions?', radio('ia-medical')],
+      ['Medical Condition Description', v('ia-medical-desc')],
+      ['Prescribed Medication?', radio('ia-meds')],
+      ['Medications List', v('ia-meds-list')],
+      ['Under Care of Health Professional?', radio('ia-referral')],
+    ];
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    ws['!cols'] = [{wch: 35}, {wch: 55}];
+    XLSX.utils.book_append_sheet(wb, ws, 'Initial Assessment');
+    XLSX.writeFile(wb, 'PFN_Initial_Assessment.xlsx');
+
+  } else if (type === 'diary') {
+    [1, 2, 3].forEach(day => {
+      const data = [
+        [`PALETTE FUEL NUTRITION — DAY ${day} FOOD & FLUID DIARY`],
+        ['Athlete', v('diary-name'), '', 'Date', v(`d${day}-date`)],
+        ['Training Day?', radio(`d${day}-train`), '', 'Session Time', v(`d${day}-session`)],
+        ['Match Day?', radio(`d${day}-match`)], [''],
+      ];
+
+      meals.forEach(m => {
+        data.push([m.label.replace(/[^\w\s&\/]/g, '').trim(), 'Time: ' + v(`d${day}-${m.id}-time`)]);
+        data.push(['Food / Drink', 'Amount / Portion', 'Notes']);
+        for (let r = 1; r <= 4; r++) {
+          data.push([v(`d${day}-${m.id}-r${r}-c0`), v(`d${day}-${m.id}-r${r}-c1`), v(`d${day}-${m.id}-r${r}-c2`)]);
+        }
+        data.push(['']);
+      });
+
+      data.push(['FLUIDS']);
+      data.push(['Drink', 'Amount', 'Time', 'Notes']);
+      for (let r = 1; r <= 5; r++) {
+        data.push([v(`d${day}-fluid-r${r}-c0`), v(`d${day}-fluid-r${r}-c1`), v(`d${day}-fluid-r${r}-c2`), v(`d${day}-fluid-r${r}-c3`)]);
+      }
+      data.push([''], ['DAILY REFLECTIONS', v(`d${day}-reflections`)]);
+
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      ws['!cols'] = [{wch: 32}, {wch: 20}, {wch: 20}, {wch: 28}];
+      XLSX.utils.book_append_sheet(wb, ws, `Day ${day}`);
+    });
+
+    XLSX.writeFile(wb, `PFN_Food_Diary_${v('diary-name') || 'Client'}.xlsx`);
+  }
+
+  toast('✓ Excel file downloaded!');
+}
+</script>
+
+
+<!-- SUCCESS MODAL -->
+<div id="success-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:200;align-items:center;justify-content:center">
+  <div class="success-box">
+    <div class="tick-circle">✅</div>
+    <h3>Form Submitted!</h3>
+    <p id="success-msg">Thank you — your form has been received. Palette Fuel Nutrition will be in touch with you shortly.</p>
+    <button onclick="closeSuccess()" style="padding:11px 32px;border:none;border-radius:8px;background:var(--green);color:white;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;width:100%">Close</button>
+  </div>
+</div>
+
+<script>
+// ---- SUBMIT ----
+const formLabels = {
+  consent: 'Informed Consent Form',
+  assessment: 'Initial Assessment Form',
+  diary: '3-Day Food & Fluid Diary'
+};
+
+async function submitForm(type) {
+  // Validation
+  const required = {
+    consent:    [{ id: 'con-name', label: 'Full Name' }, { id: 'con-sig', label: 'Signature' }],
+    assessment: [{ id: 'ia-name',  label: 'Full Name' }, { id: 'ia-sport', label: 'Sport' }],
+    diary:      [{ id: 'diary-name', label: 'Athlete Name' }]
+  };
+  const missing = (required[type] || []).filter(f => !document.getElementById(f.id)?.value.trim());
+  if (missing.length) { toast('⚠ Please fill in: ' + missing.map(f => f.label).join(', ')); return; }
+
+  if (type === 'consent') {
+    const unticked = ['c1','c2','c3','c4','c5','c6'].filter(id => !document.getElementById(id)?.checked);
+    if (unticked.length) { toast('⚠ Please tick all consent boxes before submitting'); return; }
+  }
+
+  // Collect data into a flat object for Formspree
+  let data = { _subject: 'PFN Form Submission — ' + formLabels[type] };
+
+  if (type === 'consent') {
+    data = { ...data,
+      'Form': 'Informed Consent',
+      'Athlete Name': v('con-name'), 'Date of Birth': v('con-dob'),
+      'Signature': v('con-sig'), 'Date': v('con-date'),
+      'Consent 1 – Read & understood': document.getElementById('c1').checked ? 'Yes' : 'No',
+      'Consent 2 – Not medical advice': document.getElementById('c2').checked ? 'Yes' : 'No',
+      'Consent 3 – Assessments & diaries': document.getElementById('c3').checked ? 'Yes' : 'No',
+      'Consent 4 – GDPR data storage': document.getElementById('c4').checked ? 'Yes' : 'No',
+      'Consent 5 – Right to withdraw': document.getElementById('c5').checked ? 'Yes' : 'No',
+      'Consent 6 – Notify health changes': document.getElementById('c6').checked ? 'Yes' : 'No',
+      'U18 – Child consent': document.getElementById('u1').checked ? 'Yes' : 'No',
+      'U18 – Agrees scope & GDPR': document.getElementById('u2').checked ? 'Yes' : 'No',
+      'U18 – Contact consent': document.getElementById('u3').checked ? 'Yes' : 'No',
+      'Parent/Guardian Name': v('pg-name'), 'Parent/Guardian Relationship': v('pg-rel'),
+      'Parent/Guardian Signature': v('pg-sig'), 'Parent/Guardian Date': v('pg-date'),
+    };
+  } else if (type === 'assessment') {
+    data = { ...data,
+      'Form': 'Initial Assessment',
+      'Full Name': v('ia-name'), 'Date of Birth': v('ia-dob'), 'Age': v('ia-age'),
+      'Gender': v('ia-gender'), 'Assessment Date': v('ia-assess-date'),
+      'Email': v('ia-email'), 'Phone': v('ia-phone'),
+      'Parent/Guardian Name': v('ia-pg-name'), 'Parent/Guardian Contact': v('ia-pg-contact'),
+      'Sport': v('ia-sport'), 'Team/Club': v('ia-club'), 'Playing Level': v('ia-level'),
+      'Position': v('ia-position'), 'Years Playing': v('ia-years'),
+      'Training Days/Week': v('ia-train-days'), 'Session Length': v('ia-sess-len'),
+      'Match Days': v('ia-match-days'), 'Season Phase': v('ia-season'),
+      'Main Goal': v('ia-goal'), 'Goal Description': v('ia-goal-desc'), 'Goal Timeframe': v('ia-goal-time'),
+      'Wake Time': v('ia-wake'), 'Eats Breakfast': radio('ia-breakfast'),
+      'Typical Day of Eating': v('ia-typical-day'),
+      'Eats Before Training': radio('ia-pre-train'), 'Pre-Training Food': v('ia-pre-train-food'),
+      'Eats After Training': radio('ia-post-train'), 'Post-Training Food': v('ia-post-train-food'),
+      'Eats on Match Days': radio('ia-match-eat'), 'Match Day Nutrition': v('ia-match-nutrition'),
+      'Daily Water Intake': v('ia-water'), 'Main Drinks': v('ia-drinks'),
+      'Drinks During Training': radio('ia-drink-train'), 'Hydration Rating': radio('hydration'),
+      'Takes Supplements': radio('ia-supps'), 'Supplements': v('ia-supp-list'),
+      'Specific Diet': v('ia-diet'), 'Allergies/Intolerances': v('ia-allergies'), 'Foods Avoided': v('ia-dislikes'),
+      'Current Injuries': radio('ia-injury'), 'Injury Description': v('ia-injury-desc'),
+      'Medical Conditions': radio('ia-medical'), 'Medical Description': v('ia-medical-desc'),
+      'Prescribed Medication': radio('ia-meds'), 'Medications': v('ia-meds-list'),
+      'Under Health Professional Care': radio('ia-referral'),
+    };
+  } else if (type === 'diary') {
+    data['Form'] = '3-Day Food Diary';
+    data['Athlete Name'] = v('diary-name');
+    data['Diary Start Date'] = v('diary-start');
+    data['Diary End Date'] = v('diary-end');
+    [1,2,3].forEach(day => {
+      data[`Day ${day} Date`] = v(`d${day}-date`);
+      data[`Day ${day} Training Day`] = radio(`d${day}-train`);
+      data[`Day ${day} Session Time`] = v(`d${day}-session`);
+      data[`Day ${day} Match Day`] = radio(`d${day}-match`);
+      ['breakfast','mid-morning','lunch','afternoon','evening-meal','evening-snack'].forEach(meal => {
+        const rows = [1,2,3,4].map(r =>
+          [v(`d${day}-${meal}-r${r}-c0`), v(`d${day}-${meal}-r${r}-c1`), v(`d${day}-${meal}-r${r}-c2`)]
+            .filter(x=>x).join(' | ')
+        ).filter(x=>x).join(' / ');
+        if (rows) data[`Day ${day} ${meal}`] = rows;
+      });
+      const fluids = [1,2,3,4,5].map(r =>
+        [v(`d${day}-fluid-r${r}-c0`), v(`d${day}-fluid-r${r}-c1`)].filter(x=>x).join(' ')
+      ).filter(x=>x).join(', ');
+      if (fluids) data[`Day ${day} Fluids`] = fluids;
+      if (v(`d${day}-reflections`)) data[`Day ${day} Reflections`] = v(`d${day}-reflections`);
+    });
+  }
+
+  // Show loading state
+  const btn = event.target;
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+
+  try {
+    const res = await fetch('https://formspree.io/f/xdabjobz', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    if (res.ok) {
+      document.getElementById('success-msg').textContent =
+        'Thank you — your ' + formLabels[type] + ' has been received. Palette Fuel Nutrition will be in touch with you shortly.';
+      document.getElementById('success-overlay').style.display = 'flex';
+    } else {
+      const json = await res.json();
+      toast('⚠ Submission failed: ' + (json.error || 'Please try again'));
+    }
+  } catch(err) {
+    toast('⚠ Network error — please check your connection and try again');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '✅ Submit Form';
+  }
+}
+
+function closeSuccess() {
+  document.getElementById('success-overlay').style.display = 'none';
+}
+
+document.getElementById('success-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeSuccess();
+});
+</script>
+
+<!-- PASSWORD MODAL -->
+<div id="auth-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:200;align-items:center;justify-content:center">
+  <div style="background:white;border-radius:14px;padding:32px 36px;width:340px;max-width:92vw;box-shadow:0 8px 32px rgba(0,0,0,0.18)">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:2rem">🔒</div>
+      <h3 style="font-family:'Playfair Display',serif;color:var(--green-dark);font-size:1.2rem;margin-top:8px">Admin Access</h3>
+      <p style="font-size:0.8rem;color:var(--mid);margin-top:4px">Enter password to download</p>
+    </div>
+    <input type="password" id="auth-input" placeholder="Password"
+      style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;margin-bottom:8px"
+      onkeydown="if(event.key==='Enter')checkAuth()">
+    <div id="auth-error" style="color:#e05050;font-size:0.78rem;min-height:18px;margin-bottom:8px"></div>
+    <div style="display:flex;gap:10px">
+      <button onclick="closeAuth()" style="flex:1;padding:10px;border:1.5px solid var(--border);border-radius:8px;background:var(--green-light);font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:600;color:var(--mid);cursor:pointer">Cancel</button>
+      <button onclick="checkAuth()" style="flex:1;padding:10px;border:none;border-radius:8px;background:var(--green);color:white;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer">Download</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---- AUTH ----
+// SHA-256 hash of your password. Change ONLY this hash.
+// Default password: PFN2025 — replace hash to change it.
+const PASS_HASH = 'e3ba6a0e89c89a4d9e4e4ef89e11a5dfb86ecd50e8a76cb56e42b32ed55d68f3';
+
+let _pendingType = null;
+
+async function sha256(msg) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+function authDownload(type) {
+  _pendingType = type;
+  document.getElementById('auth-input').value = '';
+  document.getElementById('auth-error').textContent = '';
+  const overlay = document.getElementById('auth-overlay');
+  overlay.style.display = 'flex';
+  setTimeout(() => document.getElementById('auth-input').focus(), 50);
+}
+
+function closeAuth() {
+  document.getElementById('auth-overlay').style.display = 'none';
+  _pendingType = null;
+}
+
+async function checkAuth() {
+  const input = document.getElementById('auth-input').value;
+  const hash = await sha256(input);
+  if (hash === PASS_HASH) {
+    closeAuth();
+    downloadExcel(_pendingType);
+  } else {
+    document.getElementById('auth-error').textContent = '✗ Incorrect password. Please try again.';
+    document.getElementById('auth-input').value = '';
+    document.getElementById('auth-input').focus();
+  }
+}
+
+// Close on backdrop click
+document.getElementById('auth-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeAuth();
+});
+</script>
+
+</body>
+</html>
